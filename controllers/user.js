@@ -4,7 +4,6 @@ const mysqlPool = require("../db");
 
 async function registerUser(req, res) {
   const { email, name, password } = req.body;
-  console.log(email);
   const hashedPassword = await bcrypt.hash(password, 10);
   try {
     // check if a user exist with the email address
@@ -48,16 +47,16 @@ async function loginUser(req, res) {
       WHERE email = ? `,
       [email]
     );
-    console.log(getTheUser)
     if (getTheUser) {
       const passwordInDb = getTheUser[0].password;
       const isMatch = await bcrypt.compare(password, passwordInDb);
       if (isMatch) {
         const jwtSecret = process.env.JWT_SECRET;
         const expirationInHours = "1000h";
+  
         const token = jwt.sign(
           {
-            id: getTheUser.id,
+            id: getTheUser[0].id,
             email: getTheUser[0].email,
           },
           jwtSecret,
